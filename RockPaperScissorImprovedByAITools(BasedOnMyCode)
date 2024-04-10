@@ -1,0 +1,95 @@
+#include <iostream>
+#include <vector>
+#include <ctime>
+#include <cstdlib>
+
+int getPlayerChoice() {
+    char choice;
+    std::cout << "Enter Choice: ";
+    std::cin >> choice;
+    std::cin.ignore();
+    return tolower(choice);
+}
+
+bool isValidInput(char choice) {
+    return (choice == 'r' || choice == 'p' || choice == 's');
+}
+
+char generateAIChoice(const std::vector<char>& choices) {
+    return choices[rand() % choices.size()];
+}
+
+void printResult(char playerChoice, char aiChoice, int& playerScore, int& aiScore) {
+    if (playerChoice == aiChoice) {
+        std::cout << "Draw\n";
+    } else if ((playerChoice == 'r' && aiChoice == 's') ||
+               (playerChoice == 'p' && aiChoice == 'r') ||
+               (playerChoice == 's' && aiChoice == 'p')) {
+        std::cout << "You won!\n";
+        playerScore++;
+    } else {
+        std::cout << "You lost!\n";
+        aiScore++;
+    }
+    std::cout << "Score: " << playerScore << ":" << aiScore << std::endl;
+}
+
+int main() {
+    srand(time(NULL));
+    char playAgain;
+
+    do {
+        int bestOf;
+        std::cout << "Enter Best of (odd numbers only): ";
+        std::cin >> bestOf;
+
+        while (bestOf % 2 == 0) {
+            std::cout << "Even number. Please enter an odd number: ";
+            std::cin >> bestOf;
+        }
+
+        std::vector<char> choices = {'r', 'p', 's'};
+        int playerScore = 0;
+        int aiScore = 0;
+
+        for (int i = 0; i < bestOf; i++) {
+            char aiChoice = generateAIChoice(choices);
+            char playerChoice;
+
+            std::cout << "(r) for rock, (p) for paper, (s) for scissors\n";
+            std::cout << "Enter your choice:\n";
+            while (true) {
+                playerChoice = getPlayerChoice();
+                if (isValidInput(playerChoice)) {
+                    break;
+                } else {
+                    std::cout << "Invalid input. Please enter 'r', 'p', or 's'.\n";
+                }
+            }
+
+            std::cout << "AI chose: " << aiChoice << std::endl;
+            printResult(playerChoice, aiChoice, playerScore, aiScore);
+
+            if (playerScore == bestOf / 2 + 1) {
+                std::cout << "Congratulations! You won!\n";
+                break;
+            } else if (aiScore == bestOf / 2 + 1) {
+                std::cout << "Better Luck Next Time! You lost!\n";
+                break;
+            }
+        }
+
+        std::cout << "Play again? (y/n): ";
+        std::cin >> playAgain;
+        playAgain = tolower(playAgain);
+
+        while (playAgain != 'y' && playAgain != 'n') {
+            std::cout << "Invalid input. Please enter 'y' or 'n': ";
+            std::cin >> playAgain;
+        }
+
+    } while (playAgain == 'y');
+
+    std::cout << "Program Ended\n";
+    return 0;
+}
